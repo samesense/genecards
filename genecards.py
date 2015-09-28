@@ -1,10 +1,14 @@
-import requests, bs4, time
+import requests, bs4, time, sys
+sys.path.append('/Users/perry/projects/hgnc/')
+import hgnc
 
 baseUrl = 'http://www.genecards.org/'
 
 def getEnsemblGene(gene):
     """Find ENSG for this gene.
-       Look in HGNC aliases for this gene name."""
+       Look in HGNC aliases for this gene name.
+       If a page has no ENGG, use the HGNCs
+       with the hgnc module to look for one."""
     searchUrl = baseUrl + 'Search/Keyword?queryString=%s' % (gene, )
     response = requests.get(searchUrl)
     soup = bs4.BeautifulSoup(response.text)
@@ -17,9 +21,8 @@ def getEnsemblGene(gene):
             href = baseUrl + str(item).split('href="')[1].split('"')[0].split('&')[0]
             time.sleep(2)
             newHtml = requests.get(href)
-            hgncAliasSet = getPreviousHGNC(newHtml)
-            time.sleep(2)
-            ensemblSet = mkEnsemblSet(newHtml)
+            hgncAliasSet = getPreviousHGNC(newHtml) | getAlias(newHtml)
+            ensemblSet = mkEnsemblSet(newHtml) | set([hgnc.fetchEnsemblGeneIdForGeneSymbol(name)])
             if name == gene or gene in hgncAliasSet:
                 ensemblGeneSet |= ensemblSet
             if i:
@@ -51,5 +54,19 @@ def getPreviousHGNC(geneUrl_html):
                 hgncAlias.add( item.getText() )
     return hgncAlias
 
+def getAlias(geneUrl_html):
+    """Return all aliases in this genecards page."""
+    alias = set()
+    soup = bs4.BeautifulSoup(geneUrl_html.text)
+    links = soup.find_all("div", class_="gc-subsection")
+    for link in links:
+        links2 = link.find_all("h3")
+        if 'Aliases for' in str(links2):
+            links3 = link.find_all("li")
+            for item in links3:
+                alias.add( item.getText().split()[0] )
+    return alias
+
 #gene = 'ADAM1'
 #print getEnsemblGene(gene) #getPreviousHGNC('http://www.genecards.org/cgi-bin/carddisp.pl?gene=BOD1L1')
+#print( getEnsemblGene('LUST') )

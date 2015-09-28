@@ -32,3 +32,10 @@ def testEnsemblGeneWithHgncAliasV2():
     gene = 'ADAM1'
     ensemblGene = 'ENSG00000229186'
     subEnsemblGeneTest(gene, ensemblGene)
+
+def testEnsemblGeneWithAlias():
+    """LUST is an alias not found in genecard's HGNC list.
+       I must locate the ensembl ID using the HGNC REST API."""
+    gene = 'LUST'
+    ensemblGene = 'ENSG00000281691'
+    subEnsemblGeneTest(gene, ensemblGene)
