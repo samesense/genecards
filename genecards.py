@@ -51,5 +51,5 @@ def getPreviousHGNC(geneUrl_html):
                 hgncAlias.add( item.getText() )
     return hgncAlias
 
-#gene = 'BOD1L'
+#gene = 'ADAM1'
 #print getEnsemblGene(gene) #getPreviousHGNC('http://www.genecards.org/cgi-bin/carddisp.pl?gene=BOD1L1')

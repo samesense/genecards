@@ -1,21 +1,34 @@
-import genecards, nose.tools
+import genecards, nose.tools, time
 
-def testEnsemblGeneWithNoHgncAlias():
-    """BRAF is the first genecards link, 
-       and the genecards page is easily
-       matched to BRAF."""
-    gene = 'BRAF'
+'''
+Testing gene symbol to ensembl gene ID conversion.
+'''
+
+def subEnsemblGeneTest(gene, ensemblID):
     ensemblSet = genecards.getEnsemblGene(gene)
     nose.tools.assert_true(len(ensemblSet) == 1)
-    nose.tools.assert_true(list(ensemblSet)[0] == 'ENSG00000157764')
+    nose.tools.assert_true(list(ensemblSet)[0] == ensemblID)
+    time.sleep(2)
 
-def testEnsemblGeneWithHgncAlias():
-    """BOD1L is an old HGNC name for
-       BOD1L1. An HGNC alias must be
+def testEnsemblGeneWithNoHgncAlias():
+    """BRAF is the first genecards link.
+       The genecards page is easily
+       matched to BRAF."""
+    gene = 'BRAF'
+    ensemblGene = 'ENSG00000157764'
+    subEnsemblGeneTest(gene, ensemblGene)
+
+def testEnsemblGeneWithHgncAliasV1():
+    """BOD1L is an old HGNC name for BOD1L1.
+       An HGNC alias must be
        used to recognize input BOD1L as
        the BOD1L1 gene stored in genecards."""
     gene = 'BOD1L'
-    ensemblSet = genecards.getEnsemblGene(gene)
-    nose.tools.assert_true(len(ensemblSet) == 1)
-    nose.tools.assert_true(list(ensemblSet)[0] == 'ENSG00000038219')
-
+    ensemblGene = 'ENSG00000038219'
+    subEnsemblGeneTest(gene, ensemblGene)
+    
+def testEnsemblGeneWithHgncAliasV2():
+    """ADAM1 is an old HGNC name"""
+    gene = 'ADAM1'
+    ensemblGene = 'ENSG00000229186'
+    subEnsemblGeneTest(gene, ensemblGene)
